@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clasificador de datos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #formulario {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #555;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        #resultado {
+            margin-top: 20px;
+            color: #333;
+        }
+    </style>
+    <script>
+        function clasificarDatos(event) {
+            event.preventDefault();
+            const CRIM = document.getElementById('CRIM').value;
+            const NX = document.getElementById('NX').value;
+            const RM = document.getElementById('RM').value;
+            const DIS = document.getElementById('DIS').value;
+            const TAX = document.getElementById('TAX').value;
+            const LSTAT = document.getElementById('LSTAT').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `CRIM=${CRIM}&NX=${NX}&RM=${RM}&DIS=${DIS}&TAX=${TAX}&LSTAT=${LSTAT}`,
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('resultado').innerText = 'Error: ' + data.error;
+                } else {
+                    document.getElementById('resultado').innerText = 'La predicción es: ' + data.categoria;
+                }
+            })
+            .catch(error => {
+                document.getElementById('resultado').innerText = 'Error en la solicitud.';
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <h1>Clasificador de datos</h1>
+    <form id="formulario" onsubmit="clasificarDatos(event)">
+        <label for="CRIM">CRIM:</label>
+        <input type="text" id="CRIM" name="CRIM"><br>
+
+        <label for="NX">NX:</label>
+        <input type="text" id="NX" name="NX"><br>
+
+        <label for="RM">RM:</label>
+        <input type="text" id="RM" name="RM"><br>
+
+        <label for="DIS">DIS:</label>
+        <input type="text" id="DIS" name="DIS"><br>
+
+        <label for="TAX">TAX:</label>
+        <input type="text" id="TAX" name="TAX"><br>
+
+        <label for="LSTAT">LSTAT:</label>
+        <input type="text" id="LSTAT" name="LSTAT"><br>
+
+        <input type="submit" value="Enviar">
+    </form>
+    <p id="resultado"></p>
+</body>
+</html>
